@@ -9,11 +9,33 @@
 body{font-family:sans-serif;background:#fff5f8;text-align:center;}
 .container{max-width:700px;margin:auto;padding:20px;}
 .card{background:#fff;padding:20px;margin:10px 0;border-radius:15px;}
-button{padding:15px;width:100%;background:#ff6fa5;color:#fff;border:none;border-radius:10px;}
+
+.btn{
+display:block;
+width:100%;
+margin:8px 0;
+padding:15px;
+border-radius:10px;
+border:none;
+background:#ffe0eb;
+}
+
+.btn:hover{background:#ffb6d0;}
+
 .hidden{display:none;}
+
 .bar{background:#eee;height:15px;border-radius:10px;margin:5px 0;}
 .fill{background:#ff6fa5;height:100%;border-radius:10px;}
-.rank{font-weight:bold;margin-bottom:5px;}
+
+button.main{
+padding:15px;
+width:100%;
+background:#ff6fa5;
+color:#fff;
+border:none;
+border-radius:10px;
+margin-top:10px;
+}
 </style>
 </head>
 
@@ -22,37 +44,36 @@ button{padding:15px;width:100%;background:#ff6fa5;color:#fff;border:none;border-
 
 <div id="start">
 <h1>🐻こぐまり婚活診断</h1>
-<button onclick="next()">診断スタート</button>
+<button class="main" onclick="next()">診断スタート</button>
 </div>
 
 <div id="quiz" class="hidden">
 <div class="card">
 <p id="q"></p>
-<select id="a"></select>
+<div id="choices"></div>
 </div>
-<button onclick="next()">次へ</button>
 </div>
 
 <div id="result" class="hidden">
 <h2 id="totalRank"></h2>
 
 <div class="card">
-<p>市場価値 <span id="r1" class="rank"></span></p>
+<p>市場価値 <span id="r1"></span></p>
 <div class="bar"><div id="b1" class="fill"></div></div>
 
-<p>生活適性 <span id="r2" class="rank"></span></p>
+<p>生活適性 <span id="r2"></span></p>
 <div class="bar"><div id="b2" class="fill"></div></div>
 
-<p>恋愛偏差値 <span id="r3" class="rank"></span></p>
+<p>恋愛偏差値 <span id="r3"></span></p>
 <div class="bar"><div id="b3" class="fill"></div></div>
 
-<p>結婚現実性 <span id="r4" class="rank"></span></p>
+<p>結婚現実性 <span id="r4"></span></p>
 <div class="bar"><div id="b4" class="fill"></div></div>
 </div>
 
 <p id="advice"></p>
 
-<button onclick="goLine()">🐻無料相談を受ける</button>
+<button class="main" onclick="goLine()">🐻無料相談を受ける</button>
 </div>
 
 </div>
@@ -61,29 +82,35 @@ button{padding:15px;width:100%;background:#ff6fa5;color:#fff;border:none;border-
 
 const qs=[
 
+// 性別
 ["性別","gender",[["男性",1],["女性",2]]],
 
+// 市場価値
 ["年齢","market",[["20代",10],["30前半",9],["30後半",7],["40以上",5]]],
 ["年収","market",[["〜300万",2],["300〜400万",4],["400〜600万",6],["600〜800万",8],["800万以上",10]]],
-["職業","market",[
-["会社員（大手）",10],
-["会社員（中小）",7],
-["公務員",9],
-["経営者",8],
-["個人事業主",6],
-["非正規",3]
-]],
+["職業","market",[["大手会社員",10],["中小会社員",7],["公務員",9],["経営者",8],["個人事業主",6],["非正規",3]]],
+["勤続年数","market",[["5年以上",10],["3年以上",7],["1年未満",3]]],
 
-["一人暮らし","life",[["している",10],["実家",5]]],
+// 生活
+["居住状況","life",[["一人暮らし",10],["過去一人暮らし",7],["実家",5]]],
 ["貯蓄","life",[["1000万以上",10],["500万以上",8],["200万以上",6],["50万以上",4],["なし",2]]],
 ["自炊","life",[["週3以上",10],["週1",6],["しない",3]]],
+["掃除","life",[["週1以上",10],["月1",6],["ほぼしない",3]]],
+["生活リズム","life",[["安定",10],["普通",6],["不規則",3]]],
 
+// 恋愛偏差値
 ["清潔感","love",[["高い",10],["普通",6],["低い",3]]],
 ["会話力","love",[["高い",10],["普通",6],["低い",3]]],
+["共感力","love",[["高い",10],["普通",6],["低い",3]]],
 ["柔軟性","love",[["ある",10],["普通",6],["ない",3]]],
+["自己中心性","love",[["低い",10],["普通",6],["高い",3]]],
 
+// 結婚現実性
 ["理想の高さ","real",[["現実的",10],["やや高い",6],["高い",3]]],
-["結婚意欲","real",[["すぐしたい",10],["1〜2年",7],["未定",3]]]
+["結婚意欲","real",[["すぐしたい",10],["1〜2年",7],["未定",3]]],
+["条件幅","real",[["広い",10],["普通",6],["狭い",3]]],
+["改善意欲","real",[["高い",10],["普通",6],["低い",3]]],
+["親との同居","real",[["しない",10],["状況次第",6],["する",3]]]
 
 ];
 
@@ -91,17 +118,10 @@ let i=0;
 let gender="male";
 let score={market:0,life:0,love:0,real:0};
 
-function next(){
+function next(val){
 
-if(i===0){
-start.classList.add("hidden");
-quiz.classList.remove("hidden");
-}
-
-if(i>0){
-let val=+a.value;
+if(val!==undefined){
 let type=qs[i-1][1];
-
 if(type==="gender"){
 gender = val===1?"male":"female";
 }else{
@@ -109,15 +129,22 @@ score[type]+=val;
 }
 }
 
+if(i===0){
+start.classList.add("hidden");
+quiz.classList.remove("hidden");
+}
+
 if(i>=qs.length){show();return;}
 
 q.innerText=qs[i][0];
-a.innerHTML="";
+
+choices.innerHTML="";
 qs[i][2].forEach(v=>{
-let op=document.createElement("option");
-op.value=v[1];
-op.text=v[0];
-a.appendChild(op);
+let btn=document.createElement("button");
+btn.className="btn";
+btn.innerText=v[0];
+btn.onclick=()=>next(v[1]);
+choices.appendChild(btn);
 });
 
 i++;
@@ -143,35 +170,27 @@ let r=score.real*2;
 
 let total;
 
-// 男女別アルゴリズム
 if(gender==="male"){
 total = m*1.5 + lo*1.0 + l*1.0 + r*1.0;
 }else{
 total = m*1.0 + lo*1.5 + l*1.2 + r*1.3;
 }
 
-total = total / 4;
+total/=4;
 
 totalRank.innerText="総合："+rank(total)+"ランク";
 
-// バー
 b1.style.width=m+"%";
 b2.style.width=l+"%";
 b3.style.width=lo+"%";
 b4.style.width=r+"%";
 
-// ランク表示
 r1.innerText=rank(m);
 r2.innerText=rank(l);
 r3.innerText=rank(lo);
 r4.innerText=rank(r);
 
-// アドバイス
-if(gender==="male"){
-advice.innerText="🐻 年収・安定性と行動で一気に伸びます";
-}else{
-advice.innerText="🐻 恋愛偏差値と柔軟性を整えると一気に変わります";
-}
+advice.innerText="🐻 弱い項目を重点的に改善すると一気に変わります";
 
 }
 
