@@ -41,13 +41,11 @@ button {
 <body>
 <div class="container">
 
-<!-- スタート -->
 <div id="start">
   <h1>🐻こぐまり婚活診断</h1>
   <button onclick="next()">診断スタート</button>
 </div>
 
-<!-- 質問 -->
 <div id="quiz" class="hidden">
   <div class="card">
     <p id="question"></p>
@@ -56,7 +54,6 @@ button {
   <button onclick="next()">次へ</button>
 </div>
 
-<!-- 結果 -->
 <div id="result" class="hidden">
   <h2 id="score"></h2>
   <p id="type"></p>
@@ -73,7 +70,7 @@ button {
     <div class="bar"><div id="b3" class="fill"></div></div>
   </div>
 
-  <button onclick="goLine()">🐻相談する</button>
+  <button onclick="goLine()">🐻無料相談する</button>
 </div>
 
 </div>
@@ -177,7 +174,7 @@ function showResult(){
 }
 
 function goLine(){
-  window.location.href="https://line.me/";
+  window.location.href="https://page.line.me/818gjflb?openQrModal=true";
 }
 
 </script>
