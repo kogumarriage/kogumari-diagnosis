@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こぐまり婚活診断</title>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #fff5f8;
+  margin: 0;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
+
+h1 {
+  color: #ff6fa5;
+}
+
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+select, button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  background: #ff6fa5;
+  color: white;
+  font-weight: bold;
+}
+
+.bar {
+  height: 20px;
+  background: #eee;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.fill {
+  height: 100%;
+  background: #ff6fa5;
+  border-radius: 10px;
+}
+
+.hidden {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- スタート -->
+<div id="start">
+  <h1>🐻こぐまり婚活診断</h1>
+  <p>いっしょに婚活の作戦、考えてみようか？</p>
+  <button onclick="start()">診断スタート ▶</button>
+</div>
+
+<!-- 質問 -->
+<div id="quiz" class="hidden">
+
+  <div class="card">
+    <p>年齢を選んでください</p>
+    <select id="age">
+      <option value="15">20代</option>
+      <option value="14">30代前半</option>
+      <option value="12">30代後半</option>
+      <option value="9">40代以上</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <p>年収を選んでください</p>
+    <select id="income">
+      <option value="3">〜300万</option>
+      <option value="5">300〜399万</option>
+      <option value="6">400〜499万</option>
+      <option value="8">500〜599万</option>
+      <option value="10">600万以上</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <p>行動量は？</p>
+    <select id="action">
+      <option value="3">少ない</option>
+      <option value="6">普通</option>
+      <option value="10">多い</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <p>コミュニケーションは？</p>
+    <select id="comm">
+      <option value="3">苦手</option>
+      <option value="6">普通</option>
+      <option value="10">得意</option>
+    </select>
+  </div>
+
+  <button onclick="calculate()">診断する ▶</button>
+
+</div>
+
+<!-- ローディング -->
+<div id="loading" class="hidden">
+  <h2>🐻考え中…</h2>
+  <p>あなたに合う作戦を分析しています</p>
+</div>
+
+<!-- 結果 -->
+<div id="result" class="hidden">
+
+  <h1>🐻診断結果</h1>
+
+  <h2 id="score"></h2>
+  <p id="comment"></p>
+
+  <div class="card">
+    <p>市場価値</p>
+    <div class="bar"><div id="bar1" class="fill"></div></div>
+
+    <p>恋愛偏差値</p>
+    <div class="bar"><div id="bar2" class="fill"></div></div>
+
+    <p>行動力</p>
+    <div class="bar"><div id="bar3" class="fill"></div></div>
+  </div>
+
+  <div class="card">
+    <h3>🐻タイプ</h3>
+    <p id="type"></p>
+  </div>
+
+  <div class="card">
+    <h3>🐻改善ポイント</h3>
+    <p id="advice"></p>
+  </div>
+
+  <button onclick="goLine()">🐻相談してみる</button>
+
+</div>
+
+</div>
+
+<script>
+
+function start() {
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+}
+
+function calculate() {
+
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("loading").classList.remove("hidden");
+
+  setTimeout(() => {
+
+    let age = +document.getElementById("age").value;
+    let income = +document.getElementById("income").value;
+    let action = +document.getElementById("action").value;
+    let comm = +document.getElementById("comm").value;
+
+    let total = age + income + action + comm;
+
+    let market = age + income;
+    let love = comm;
+    let act = action;
+
+    let type = "";
+    let advice = "";
+    let comment = "";
+
+    if (total >= 30) {
+      type = "バランス型";
+      advice = "このまま続ければ結果が出やすいよ！";
+      comment = "かなり良い位置にいるよ";
+    } else if (total >= 22) {
+      type = "努力型";
+      advice = "方向性を少し見直せば一気に伸びる！";
+      comment = "伸びしろが大きい状態だね";
+    } else {
+      type = "改善型";
+      advice = "行動と考え方を変えると大きく変わるよ";
+      comment = "ここから一気に変えられるよ";
+    }
+
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+
+    document.getElementById("score").innerText = total + "点";
+    document.getElementById("type").innerText = type;
+    document.getElementById("advice").innerText = advice;
+    document.getElementById("comment").innerText = comment;
+
+    document.getElementById("bar1").style.width = (market * 5) + "%";
+    document.getElementById("bar2").style.width = (love * 10) + "%";
+    document.getElementById("bar3").style.width = (act * 10) + "%";
+
+  }, 1500);
+}
+
+function goLine() {
+  window.location.href = "https://line.me/";
+}
+
+</script>
+
+</body>
+</html>
