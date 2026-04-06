@@ -71,23 +71,22 @@ border:none;border-radius:10px;margin-top:10px;
 
 const qs=[
 
-// 性別
 ["性別","gender",[["男性",1],["女性",2]]],
 
 // 市場価値
 ["年齢","market",[["20代",10],["30前半",9],["30後半",7],["40以上",5]]],
 ["年収","market",[["〜300万",2],["300〜400万",4],["400〜600万",6],["600〜800万",8],["800万以上",10]]],
-["業種","market",[["大手企業",10],["公務員",9],["研究職",9],["医療介護",7],["物流",6],["サービス業",5],["その他",6]]],
+["業種","market",[["大手企業",10],["公務員",9],["研究職",9],["医療介護",7],["物流",6],["サービス",5],["その他",6]]],
 ["役職","market",[["経営者",10],["管理職",8],["主任",6],["一般",5]]],
-["雇用形態","market",[["正社員",10],["契約",6],["アルバイト",3]]],
-["学歴","market",[["大学院",10],["大卒",8],["専門",6],["高卒",4]]],
+["雇用","market",[["正社員",10],["契約",6],["アルバイト",3]]],
+["学歴","market",[["院卒",10],["大卒",8],["専門",6],["高卒",4]]],
 ["身長","market",[["175以上",10],["170前後",7],["165前後",5],["それ以下",3]]],
 
 // 生活
-["居住状況","life",[["一人暮らし",10],["過去一人暮らし",7],["実家",5]]],
-["貯蓄","life",[["1000万以上",10],["500万以上",8],["200万以上",6],["50万以上",4],["なし",2]]],
-["喫煙","life",[["吸わない",10],["時々",5],["吸う",2]]],
-["飲酒","life",[["飲まない",10],["週1",7],["頻繁",3]]],
+["居住","life",[["一人暮らし",10],["経験あり",7],["実家",5]]],
+["貯蓄","life",[["1000万以上",10],["500万",8],["200万",6],["50万",4],["なし",2]]],
+["喫煙","life",[["しない",10],["時々",5],["する",2]]],
+["飲酒","life",[["しない",10],["週1",7],["頻繁",3]]],
 ["ギャンブル","life",[["しない",10],["たまに",5],["する",2]]],
 
 // 恋愛
@@ -97,56 +96,45 @@ const qs=[
 ["柔軟性","love",[["ある",10],["普通",6],["ない",3]]],
 
 // 現実
-["理想の高さ","real",[["現実的",10],["やや高い",6],["高い",3]]],
-["結婚意欲","real",[["すぐしたい",10],["1〜2年",7],["未定",3]]],
+["理想","real",[["現実的",10],["やや高い",6],["高い",3]]],
+["結婚意欲","real",[["すぐ",10],["1〜2年",7],["未定",3]]],
 ["改善意欲","real",[["高い",10],["普通",6],["低い",3]]],
-["宗教","real",[["なし",10],["ゆるい",6],["信仰あり",3]]]
+["宗教","real",[["なし",10],["ゆるい",6],["あり",3]]]
 
 ];
 
-let i=0;
-let gender="male";
+let i=0,gender="male";
 let score={market:0,life:0,love:0,real:0};
-
-// 一発アウトフラグ
 let fatal=false;
 
 function next(val){
 
 if(val!==undefined){
 let type=qs[i-1][1];
-let qText=qs[i-1][0];
+let name=qs[i-1][0];
 
-if(type==="gender"){
-gender = val===1?"male":"female";
-}else{
-score[type]+=val;
+if(type==="gender"){gender=val===1?"male":"female";}
+else{score[type]+=val;}
+
+// 一発アウト強化
+if(name==="ギャンブル" && val===2) fatal=true;
+if(name==="宗教" && val===3) fatal=true;
+if(name==="清潔感" && val===3) fatal=true;
+if(name==="改善意欲" && val===3) fatal=true;
 }
 
-// 一発アウト条件
-if(qText==="ギャンブル" && val===2) fatal=true;
-if(qText==="宗教" && val===3) fatal=true;
-if(qText==="清潔感" && val===3) fatal=true;
-if(qText==="改善意欲" && val===3) fatal=true;
-
-}
-
-if(i===0){
-start.classList.add("hidden");
-quiz.classList.remove("hidden");
-}
+if(i===0){start.classList.add("hidden");quiz.classList.remove("hidden");}
 
 if(i>=qs.length){show();return;}
 
 q.innerText=qs[i][0];
-
 choices.innerHTML="";
 qs[i][2].forEach(v=>{
-let btn=document.createElement("button");
-btn.className="btn";
-btn.innerText=v[0];
-btn.onclick=()=>next(v[1]);
-choices.appendChild(btn);
+let b=document.createElement("button");
+b.className="btn";
+b.innerText=v[0];
+b.onclick=()=>next(v[1]);
+choices.appendChild(b);
 });
 
 i++;
@@ -170,23 +158,24 @@ let l=score.life*2;
 let lo=score.love*2;
 let r=score.real*2;
 
-let total;
+// 男女別深掘り
+let bonus=0;
 
 if(gender==="male"){
-total = m*1.5 + lo + l + r;
+bonus = (m * (m/100)); // 年収×年齢的な市場力
 }else{
-total = m + lo*1.5 + l*1.2 + r*1.3;
+bonus = (lo * (score.market/50)); // 恋愛×年齢
 }
 
-total/=4;
+let total = (m+l+lo+r)/4 + bonus*0.1;
 
-// 一発アウト適用
 if(fatal){
-totalRank.innerText="総合：D（要改善）";
+totalRank.innerText="総合：D（致命的課題あり）";
 }else{
 totalRank.innerText="総合："+rank(total)+"ランク";
 }
 
+// 表示
 b1.style.width=m+"%";
 b2.style.width=l+"%";
 b3.style.width=lo+"%";
@@ -197,11 +186,19 @@ r2.innerText=rank(l);
 r3.innerText=rank(lo);
 r4.innerText=rank(r);
 
+// アドバイス分岐
+let msg="";
+
 if(fatal){
-advice.innerText="🐻 一部の項目が成婚の大きな障害になっています。優先的な改善が必要です";
+msg="🐻 成婚に大きな障害があります。優先改善が必要です";
 }else{
-advice.innerText="🐻 弱い項目を改善すると一気に評価が上がります";
+if(m<50) msg+="市場価値を上げる行動（転職・年収改善）が有効\n";
+if(l<50) msg+="生活力（清潔感・習慣）を改善\n";
+if(lo<50) msg+="恋愛スキル改善（会話・見た目）\n";
+if(r<50) msg+="理想条件を現実に寄せる\n";
 }
+
+advice.innerText=msg;
 
 }
 
