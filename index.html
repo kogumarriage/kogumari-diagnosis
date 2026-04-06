@@ -6,10 +6,10 @@
 <title>こぐまり婚活診断</title>
 
 <style>
-body { font-family:sans-serif; background:#fff5f8; text-align:center; }
-.container { max-width:700px; margin:auto; padding:20px; }
-.card { background:white; padding:20px; margin:10px 0; border-radius:15px; }
-button { padding:15px; width:100%; background:#ff6fa5; color:white; border:none; border-radius:10px; }
+body{font-family:sans-serif;background:#fff5f8;text-align:center;}
+.container{max-width:700px;margin:auto;padding:20px;}
+.card{background:#fff;padding:20px;margin:10px 0;border-radius:15px;}
+button{padding:15px;width:100%;background:#ff6fa5;color:#fff;border:none;border-radius:10px;}
 .hidden{display:none;}
 .bar{background:#eee;height:15px;border-radius:10px;margin:5px 0;}
 .fill{background:#ff6fa5;height:100%;border-radius:10px;}
@@ -36,20 +36,10 @@ button { padding:15px; width:100%; background:#ff6fa5; color:white; border:none;
 <h2 id="totalRank"></h2>
 
 <div class="card">
-<p>基礎スペック</p>
-<div class="bar"><div id="b1" class="fill"></div></div>
-
-<p>生活適性</p>
-<div class="bar"><div id="b2" class="fill"></div></div>
-
-<p>婚活状況</p>
-<div class="bar"><div id="b3" class="fill"></div></div>
-
-<p>恋愛偏差値</p>
-<div class="bar"><div id="b4" class="fill"></div></div>
-
-<p>行動力</p>
-<div class="bar"><div id="b5" class="fill"></div></div>
+<p>市場価値</p><div class="bar"><div id="b1" class="fill"></div></div>
+<p>生活適性</p><div class="bar"><div id="b2" class="fill"></div></div>
+<p>恋愛偏差値</p><div class="bar"><div id="b3" class="fill"></div></div>
+<p>結婚現実性</p><div class="bar"><div id="b4" class="fill"></div></div>
 </div>
 
 <p id="advice"></p>
@@ -61,42 +51,51 @@ button { padding:15px; width:100%; background:#ff6fa5; color:white; border:none;
 
 <script>
 
-const qs = [
+const qs=[
 
-/* 基礎 */
-["年齢","base",[["20代",10],["30前半",9],["30後半",7],["40以上",5]]],
-["年収","base",[["〜300",3],["300〜500",6],["500〜700",8],["700以上",10]]],
-["職業安定","base",[["安定",10],["普通",6],["不安",3]]],
-["婚姻歴","base",[["初婚",10],["離婚",6],["子あり",3]]],
+/* 市場価値 */
+["年齢","market",[["20代",10],["30前半",9],["30後半",7],["40以上",5]]],
+["年収","market",[["〜300万",2],["300〜400万",4],["400〜600万",6],["600〜800万",8],["800万以上",10]]],
+["職業","market",[
+["会社員（大手）",10],
+["会社員（中小）",7],
+["公務員",9],
+["経営者",8],
+["個人事業主",6],
+["非正規",3]
+]],
+["雇用安定性","market",[["安定",10],["普通",6],["不安定",3]]],
 
 /* 生活 */
-["一人暮らし","life",[["はい",10],["実家",5]]],
-["自炊頻度","life",[["週3以上",10],["週1",6],["なし",3]]],
-["貯蓄","life",[["100万以上",10],["50万",6],["なし",3]]],
+["一人暮らし","life",[["している",10],["実家",5]]],
+["貯蓄","life",[
+["1000万以上",10],
+["500万以上",8],
+["200万以上",6],
+["50万以上",4],
+["なし",2]
+]],
+["自炊","life",[["週3以上",10],["週1",6],["しない",3]]],
 ["生活リズム","life",[["安定",10],["普通",6],["不規則",3]]],
 
-/* 婚活 */
-["活動期間","marry",[["6ヶ月以内",10],["1年",7],["それ以上",5]]],
-["月申込数","marry",[["30以上",10],["10〜30",7],["10未満",4]]],
-["成立数/月","marry",[["10以上",10],["5前後",7],["少ない",4]]],
-["交際移行","marry",[["高い",10],["普通",6],["低い",3]]],
+/* 恋愛偏差値 */
+["清潔感","love",[["高い",10],["普通",6],["低い",3]]],
+["会話力","love",[["高い",10],["普通",6],["低い",3]]],
+["共感力","love",[["高い",10],["普通",6],["低い",3]]],
+["柔軟性","love",[["ある",10],["普通",6],["ない",3]]],
 
-/* 思考 */
-["会話力","mind",[["高い",10],["普通",6],["低い",3]]],
-["共感力","mind",[["高い",10],["普通",6],["低い",3]]],
-["柔軟性","mind",[["ある",10],["普通",6],["ない",3]]],
-["理想の高さ","mind",[["現実的",10],["やや高い",6],["高い",3]]],
+/* 結婚現実性 */
+["理想の高さ","real",[["現実的",10],["やや高い",6],["高い",3]]],
+["結婚意欲","real",[["すぐしたい",10],["1〜2年",7],["未定",3]]],
+["相手条件","real",[["広い",10],["普通",6],["狭い",3]]],
+["改善意欲","real",[["高い",10],["普通",6],["低い",3]]
 
-/* 行動 */
-["申込行動","act",[["積極的",10],["普通",6],["受け身",3]]],
-["改善行動","act",[["している",10],["少し",6],["しない",3]]],
-["振り返り","act",[["毎回",10],["時々",6],["なし",3]]],
-["連絡頻度","act",[["適切",10],["遅い",6],["かなり遅い",3]]],
+]
 
 ];
 
 let i=0;
-let score={base:0,life:0,marry:0,mind:0,act:0};
+let score={market:0,life:0,love:0,real:0};
 
 function next(){
 
@@ -138,23 +137,21 @@ function show(){
 quiz.classList.add("hidden");
 result.classList.remove("hidden");
 
-let base=score.base*2;
-let life=score.life*2;
-let marry=score.marry*2;
-let mind=score.mind*2;
-let act=score.act*2;
+let m=score.market*2;
+let l=score.life*2;
+let lo=score.love*2;
+let r=score.real*2;
 
-let total=(base+life+marry+mind+act)/5;
+let total=(m+l+lo+r)/4;
 
 totalRank.innerText="総合："+rank(total)+"ランク";
 
-b1.style.width=base+"%";
-b2.style.width=life+"%";
-b3.style.width=marry+"%";
-b4.style.width=mind+"%";
-b5.style.width=act+"%";
+b1.style.width=m+"%";
+b2.style.width=l+"%";
+b3.style.width=lo+"%";
+b4.style.width=r+"%";
 
-advice.innerText="🐻 行動力と婚活状況の改善で大きく伸びます";
+advice.innerText="🐻 結婚現実性と恋愛偏差値を整えると一気に伸びます";
 
 }
 
