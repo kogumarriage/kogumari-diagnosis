@@ -62,18 +62,21 @@ border:none;border-radius:10px;margin-top:10px;
 
 <p id="advice"></p>
 
-<div style="background:#fff0f5;padding:15px;border-radius:10px;margin:15px 0;">
+<div style="background:#fff0f5;padding:15px;border-radius:10px;margin:15px 0;font-size:14px;">
 🐻 この結果はまだ“簡易診断”です<br><br>
+
 あなた専用の詳細分析では<br>
 ✔ どこを直せばいいか<br>
 ✔ どんな相手と合うか<br>
 ✔ 最短ルート<br><br>
-まで具体的にお伝えできます
-</div> 
-※スクショを送るとより正確に分析できます
+
+まで具体的にお伝えできます<br><br>
+
+<strong>※この画面をスクショして送っていただくと、より正確に分析できます</strong>
 </div>
 
 <button class="main" onclick="goLine()">🐻無料であなた専用の婚活戦略を受け取る</button>
+
 </div>
 
 </div>
@@ -179,8 +182,8 @@ if(rank(l)==="S") l=100;
 if(rank(lo)==="S") lo=100;
 if(rank(r)==="S") r=100;
 
-// 男女別
 let total;
+
 if(gender==="male"){
 total = (m*1.5 + lo + l + r)/4;
 }else{
@@ -193,7 +196,6 @@ totalRank.innerText="総合：D（致命的課題あり）";
 totalRank.innerText="総合："+rank(total)+"ランク";
 }
 
-// 表示
 b1.style.width=m+"%";
 b2.style.width=l+"%";
 b3.style.width=lo+"%";
